@@ -1,12 +1,12 @@
 package jobvacancies
 
 import (
-	apperror "job_vacancies/internal/AppError"
+	"job_vacancies/internal/keywordextractor"
 	"time"
 )
 
 type VacancyGetter interface {
-	FindVacancies(keywords []string) ([]Job, apperror.AppError)
+	FindVacancies(keywords []keywordextractor.KeyWordFormat, opt SearchOptions) ([]Job, error)
 }
 
 type Job struct {
@@ -19,4 +19,12 @@ type Job struct {
 	Source       string //like "adzuna, indeed"
 	Salary       string
 	External_url string
+}
+
+type SearchOptions struct {
+	Country string
+	Limit   int
+
+	// Pagination (best effort)
+	Page int
 }

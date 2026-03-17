@@ -18,6 +18,14 @@ func (k KeyWordFormat) String() string {
 	)
 }
 
+func (k KeyWordFormat) ToString(sep string) string {
+	return fmt.Sprintf(
+		"%s %s",
+		strings.Join(k.Jobs, sep),
+		strings.Join(k.Keywords, sep),
+	)
+}
+
 func StoKeyWordFormat(input string) KeyWordFormat {
 	lines := strings.Split(input, "\n")
 

@@ -1,27 +1,20 @@
 package jobvacancies
 
-import apperror "job_vacancies/internal/AppError"
+import (
+	apperror "job_vacancies/internal/AppError"
+	"job_vacancies/internal/keywordextractor"
+)
 
-type jobVacancyService struct {
+type JobVacancyService struct {
 	providers []VacancyGetter
 }
 
-func (s *jobVacancyService) Subscribe(p VacancyGetter) {
+func (s *JobVacancyService) Subscribe(p VacancyGetter) {
 	s.providers = append(s.providers, p)
 }
 
-//todo: run jobs per service concurrent
-func (s *jobVacancyService) FindVacancies(keywords []string) ([]Job, apperror.AppError) {
-	var jobs []Job
+// todo for later: run jobs per service concurrent
+func (s *JobVacancyService) FindVacancies(keywords []keywordextractor.KeyWordFormat, opt SearchOptions) ([]Job, apperror.AppError) {
 
-	for _, provider := range s.providers {
-		result, err := provider.FindVacancies(keywords)
-		if err.Code != "" {
-			continue
-		}
-
-		jobs = append(jobs, result...)
-	}
-
-	return jobs, apperror.AppError{}
+	return nil, apperror.AppError{}
 }
