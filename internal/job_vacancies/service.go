@@ -1,7 +1,6 @@
 package jobvacancies
 
 import (
-	apperror "job_vacancies/internal/AppError"
 	"job_vacancies/internal/keywordextractor"
 )
 
@@ -14,7 +13,15 @@ func (s *JobVacancyService) Subscribe(p VacancyGetter) {
 }
 
 // todo for later: run jobs per service concurrent
-func (s *JobVacancyService) FindVacancies(keywords []keywordextractor.KeyWordFormat, opt SearchOptions) ([]Job, apperror.AppError) {
+func (s *JobVacancyService) FindVacancies(keywords []keywordextractor.KeyWordFormat, opt SearchOptions) ([]Job, error) {
+	var allJobs []Job
 
-	return nil, apperror.AppError{}
+	for _, provider := range s.providers {
+		result, err := provider.FindVacancies(keywords, opt)
+		if err != nil {
+			continue
+		}
+		allJobs = append(allJobs, result...)
+	}
+	return allJobs, nil
 }

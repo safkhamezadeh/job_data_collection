@@ -17,7 +17,8 @@ type Job struct {
 	Location     string
 	Date_posted  time.Time
 	Source       string //like "adzuna, indeed"
-	Salary       string
+	Salary_Min   float64
+	Salary_Max   float64
 	External_url string
 }
 
