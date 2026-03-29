@@ -52,3 +52,10 @@ func StoKeyWordFormat(input string) KeyWordFormat {
 	}
 	return result
 }
+
+func (f KeyWordFormat) IsValid() bool {
+	if len(f.Jobs) == 5 && len(f.Keywords) == 5 {
+		return true
+	}
+	return false
+}

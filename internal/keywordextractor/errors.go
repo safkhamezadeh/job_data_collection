@@ -5,5 +5,6 @@ import (
 )
 
 var (
-	ExternalErr apperror.AppError = apperror.AppError{Code: "EXTERNAL_SERVER_ERROR", Message: "something went wrong on the external server"}
+	ExternalErr      apperror.AppError = apperror.AppError{Code: "EXTERNAL_SERVER_ERROR", Message: "something went wrong on the external server"}
+	ErrInvalidOutput apperror.AppError = apperror.AppError{Code: "INVALID_OUTPUT", Message: "something went wrong with receiving output"}
 )
