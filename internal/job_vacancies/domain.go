@@ -6,7 +6,7 @@ import (
 )
 
 type VacancyGetter interface {
-	FindVacancies(keywords []keywordextractor.KeyWordFormat, opt SearchOptions) ([]Job, error)
+	FindVacancies(keywords keywordextractor.KeyWordFormat, opt SearchOptions) ([]Job, error)
 }
 
 type Job struct {

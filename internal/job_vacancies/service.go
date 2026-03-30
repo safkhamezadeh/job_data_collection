@@ -2,6 +2,7 @@ package jobvacancies
 
 import (
 	"job_vacancies/internal/keywordextractor"
+	"slices"
 )
 
 type JobVacancyService struct {
@@ -9,11 +10,14 @@ type JobVacancyService struct {
 }
 
 func (s *JobVacancyService) Subscribe(p VacancyGetter) {
+	if slices.Contains(s.providers, p) {
+		return
+	}
 	s.providers = append(s.providers, p)
 }
 
 // todo for later: run jobs per service concurrent
-func (s *JobVacancyService) FindVacancies(keywords []keywordextractor.KeyWordFormat, opt SearchOptions) ([]Job, error) {
+func (s *JobVacancyService) FindVacancies(keywords keywordextractor.KeyWordFormat, opt SearchOptions) ([]Job, error) {
 	var allJobs []Job
 
 	for _, provider := range s.providers {
