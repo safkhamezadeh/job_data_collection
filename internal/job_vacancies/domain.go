@@ -5,6 +5,8 @@ import (
 	"time"
 )
 
+type CountryISO2 string
+
 type VacancyGetter interface {
 	FindVacancies(keywords keywordextractor.KeyWordFormat, opt SearchOptions) ([]Job, error)
 }
@@ -14,7 +16,7 @@ type Job struct {
 	Title        string
 	Company      string
 	Description  string
-	Location     string
+	Location     Location
 	Date_posted  time.Time
 	Source       string //like "adzuna, indeed"
 	Salary_Min   float64
@@ -22,8 +24,16 @@ type Job struct {
 	External_url string
 }
 
+type Location struct {
+	Country    CountryISO2
+	City       string
+	Region     string // state/province
+	Address    string // street + number
+	PostalCode string
+}
+
 type SearchOptions struct {
-	Country string
+	Country CountryISO2
 	Limit   int
 
 	// Pagination (best effort)
