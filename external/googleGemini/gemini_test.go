@@ -60,8 +60,8 @@ keywords: w1, w2, w3, w4, w5`
 	if err != nil {
 		t.Fatalf("translate error: %v", err)
 	}
-	if len(res.Jobs) != 5 {
-		t.Errorf("expected 5 jobs, got %d", len(res.Jobs))
+	if len(res.JobTitles) != 5 {
+		t.Errorf("expected 5 jobs, got %d", len(res.JobTitles))
 	}
 	if len(res.Keywords) != 5 {
 		t.Errorf("expected 5 keywords, got %d", len(res.Keywords))

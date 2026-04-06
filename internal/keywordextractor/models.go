@@ -6,14 +6,14 @@ import (
 )
 
 type KeyWordFormat struct {
-	Jobs     []string
-	Keywords []string
+	JobTitles []string
+	Keywords  []string
 }
 
 func (k KeyWordFormat) String() string {
 	return fmt.Sprintf(
 		"titles: %s\nkeywords: %s",
-		strings.Join(k.Jobs, ", "),
+		strings.Join(k.JobTitles, ", "),
 		strings.Join(k.Keywords, ", "),
 	)
 }
@@ -21,7 +21,7 @@ func (k KeyWordFormat) String() string {
 func (k KeyWordFormat) ToString(sep string) string {
 	return fmt.Sprintf(
 		"%s %s",
-		strings.Join(k.Jobs, sep),
+		strings.Join(k.JobTitles, sep),
 		strings.Join(k.Keywords, sep),
 	)
 }
@@ -45,7 +45,7 @@ func StoKeyWordFormat(input string) KeyWordFormat {
 
 		switch key {
 		case "titles":
-			result.Jobs = values
+			result.JobTitles = values
 		case "keywords":
 			result.Keywords = values
 		}
@@ -54,7 +54,7 @@ func StoKeyWordFormat(input string) KeyWordFormat {
 }
 
 func (f KeyWordFormat) IsValid() bool {
-	if len(f.Jobs) == 5 && len(f.Keywords) == 5 {
+	if len(f.JobTitles) == 5 && len(f.Keywords) == 5 {
 		return true
 	}
 	return false
