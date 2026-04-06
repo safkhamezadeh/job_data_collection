@@ -20,11 +20,11 @@ func NewAdzunaClient(key string, id string, httpClient *http.Client) *adzunaClie
 }
 
 func (a *adzunaClient) FindVacancies(keywords keywordextractor.KeyWordFormat, opt jobvacancies.SearchOptions) ([]jobvacancies.Job, error) {
-	if !IsWhitelisted(Iso2CountryCode(opt.Country)) {
+	if !IsWhitelisted(Iso2CountryCode(opt.Location.Country)) {
 		return nil, jobvacancies.ErrInvalidCountry
 	}
 
-	pathParams := toPathParams(Iso2CountryCode(opt.Country), int64(opt.Page))
+	pathParams := toPathParams(Iso2CountryCode(opt.Location.Country), int64(opt.Page))
 
 	queryParams := toQueryParams(a.Adzuna_application_id, a.Adzuna_application_key, keywords)
 

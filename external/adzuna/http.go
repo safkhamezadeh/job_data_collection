@@ -93,16 +93,16 @@ func mapToJobs(resp AdzunaResponse) []jobvacancies.Job {
 
 	for _, j := range resp.Results {
 		jobs = append(jobs, jobvacancies.Job{
-			Id:           j.ID,
-			Title:        j.Title,
-			Company:      j.Company.DisplayName,
-			Description:  j.Description,
-			Location:     j.Location.DisplayName,
-			Date_posted:  j.Created,
-			External_url: j.RedirectURL,
-			Source:       "Adzuna",
-			Salary_Min:   j.SalaryMin,
-			Salary_Max:   j.SalaryMax,
+			Id:                  j.ID,
+			Title:               j.Title,
+			Company:             j.Company.DisplayName,
+			Description:         j.Description,
+			LocationDisplayName: j.Location.DisplayName,
+			Date_posted:         j.Created,
+			External_url:        j.RedirectURL,
+			Source:              "Adzuna",
+			Salary_Min:          j.SalaryMin,
+			Salary_Max:          j.SalaryMax,
 		})
 	}
 
