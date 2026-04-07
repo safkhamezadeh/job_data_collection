@@ -39,23 +39,18 @@ func NewGeminiClient(client *genai.Client) keywordextractor.KeywordsExtractor {
 	return &geminiClient{Client: client}
 }
 
-func (g *geminiClient) Translate(ctx context.Context, inputstr string) (*keywordextractor.KeyWordFormat, error) {
-	fullPrompt := CompleteString(PROMPT, inputstr)
+func (g *geminiClient) Translate(ctx context.Context, inputstr string) (keywordextractor.KeyWordFormat, error) {
+	fullPrompt := fmt.Sprintf(PROMPT, inputstr)
 	res, err := g.Client.Models.GenerateContent(ctx, MODEL, genai.Text(fullPrompt), nil)
 	if err != nil {
 		log.Printf("GeminiClient Translate err: %s", err)
-		return nil, keywordextractor.ExternalErr
+		return keywordextractor.KeyWordFormat{}, err
 	}
 
 	fmt := keywordextractor.StoKeyWordFormat(res.Text())
 	if fmt.IsValid() != true {
-		return nil, keywordextractor.ErrInvalidOutput
+		return keywordextractor.KeyWordFormat{}, keywordextractor.ErrInvalidOutput
 	}
 
-	return &fmt, nil
-}
-
-func CompleteString(incomplete string, toAdd string) string {
-
-	return fmt.Sprintf(incomplete, toAdd)
+	return fmt, nil
 }

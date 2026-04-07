@@ -10,28 +10,6 @@ import (
 	"google.golang.org/genai"
 )
 
-func TestCompleteString_Unit(t *testing.T) {
-	const PROMPT string = `Return 5 job titles and 5 keywords.
-Description: %s.
-Format:
-titles: t1, t2, t3, t4, t5
-keywords: w1, w2, w3, w4, w5`
-
-	var toAdd string = "i want"
-
-	var want string = `Return 5 job titles and 5 keywords.
-Description: i want.
-Format:
-titles: t1, t2, t3, t4, t5
-keywords: w1, w2, w3, w4, w5`
-
-	got := googlegemini.CompleteString(PROMPT, toAdd)
-
-	if want != got {
-		t.Errorf("CompleteString() mismatch\nwant:\n%s\n\ngot:\n%s", want, got)
-	}
-}
-
 func TestTranslate_Integration(t *testing.T) {
 	if os.Getenv("DEV") != "true" {
 		t.Skip("skipping integration test (DEV != true)")
