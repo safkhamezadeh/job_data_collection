@@ -1,6 +1,8 @@
 package jobvacancies
 
 import (
+	"context"
+	"fmt"
 	"job_vacancies/internal/keywordextractor"
 	"time"
 )
@@ -8,7 +10,7 @@ import (
 type CountryISO2 string
 
 type VacancyGetter interface {
-	FindVacancies(keywords keywordextractor.KeyWordFormat, opt SearchOptions) ([]Job, error)
+	FindVacancies(ctx context.Context, keywords keywordextractor.KeyWordFormat, opt SearchOptions) ([]Job, error)
 }
 
 type Job struct {
@@ -22,6 +24,31 @@ type Job struct {
 	Salary_Min          float64
 	Salary_Max          float64
 	External_url        string
+}
+
+func (j Job) String() string {
+	return fmt.Sprintf(
+		`Job:
+  ID:       %s
+  Title:    %s
+  Company:  %s
+  Location: %s
+  Posted:   %s
+  Source:   %s
+  Salary:   %.2f - %.2f
+  URL:      %s
+  Description: %s`,
+		j.Id,
+		j.Title,
+		j.Company,
+		j.LocationDisplayName,
+		j.Date_posted.Format("2006-01-02"),
+		j.Source,
+		j.Salary_Min,
+		j.Salary_Max,
+		j.External_url,
+		j.Description,
+	)
 }
 
 type Location struct {

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	jobvacancies "job_vacancies/internal/job_vacancies"
 	"job_vacancies/internal/keywordextractor"
+	"log"
 	"net/http"
 	"net/url"
 	"strings"
@@ -26,14 +27,20 @@ type QueryParams struct {
 	what             string //keywords to search for, space seperated
 }
 
-func toQueryParams(id string, key string, keywords keywordextractor.KeyWordFormat) QueryParams {
-	keywordstring := keywords.ToString(" ")
-	return QueryParams{app_id: id, app_key: key, results_per_page: 10, what: keywordstring}
+func toQueryParams(id string, key string, results int64, keywords keywordextractor.KeyWordFormat) QueryParams {
+	keywordstring := strings.TrimSpace(keywords.ToString(" ")) // remove trailing space
+	return QueryParams{
+		app_id:           id,
+		app_key:          key,
+		results_per_page: results,
+		what:             keywordstring,
+	}
 }
 
 func buildPath(base, template string, params PathParams) string {
+	country := strings.ToLower(string(params.country)) // lowercase!
 	path := template
-	path = strings.ReplaceAll(path, "{country}", string(params.country))
+	path = strings.ReplaceAll(path, "{country}", country)
 	path = strings.ReplaceAll(path, "{page}", fmt.Sprintf("%d", params.page))
 	return base + path
 }
@@ -43,8 +50,8 @@ func buildQuery(params QueryParams) string {
 	q.Set("app_id", params.app_id)
 	q.Set("app_key", params.app_key)
 	q.Set("results_per_page", fmt.Sprintf("%d", params.results_per_page))
-	q.Set("what", params.what)
-	return q.Encode() // produces: app_id=...&app_key=...&...
+	q.Set("what_or", params.what)
+	return q.Encode()
 }
 
 func buildRequest(pathParams PathParams, queryParams QueryParams) (*http.Request, error) {
@@ -55,6 +62,8 @@ func buildRequest(pathParams PathParams, queryParams QueryParams) (*http.Request
 	queryString := buildQuery(queryParams)
 
 	finalURL := fullPath + "?" + queryString
+
+	log.Printf("final url: %v", finalURL)
 
 	req, err := http.NewRequest("GET", finalURL, nil)
 	if err != nil {

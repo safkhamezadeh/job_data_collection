@@ -2,17 +2,18 @@ package config
 
 import "os"
 
-type ApiKeyConfig struct {
+type Config struct {
+	APIKeys APIKeyConfig
+	HTTP    HTTPConfig
+}
+
+type APIKeyConfig struct {
 	KeywordKeys    KeywordTranslationConfig
 	JobVacancyKeys JobVacancyConfig
 }
 
-func LoadApiKeys() ApiKeyConfig {
-	return ApiKeyConfig{KeywordKeys: KeywordTranslationConfig{GoogleGeminiApiKey: os.Getenv("GEMINI_API_KEY")}, JobVacancyKeys: JobVacancyConfig{loadAdzunaKeys()}}
-}
-
 type KeywordTranslationConfig struct {
-	GoogleGeminiApiKey string
+	GoogleGeminiAPIKey string
 }
 
 type JobVacancyConfig struct {
@@ -20,19 +21,44 @@ type JobVacancyConfig struct {
 }
 
 type AdzunaKeys struct {
-	Adzuna_application_key string
-	Adzuna_application_id  string
+	ApplicationKey string
+	ApplicationID  string
+}
+
+type HTTPConfig struct {
+	Port string
+}
+
+func Load() Config {
+	return Config{
+		APIKeys: loadAPIKeys(),
+		HTTP:    loadHTTPConfig(),
+	}
+}
+
+func loadAPIKeys() APIKeyConfig {
+	return APIKeyConfig{
+		KeywordKeys: KeywordTranslationConfig{
+			GoogleGeminiAPIKey: os.Getenv("GEMINI_API_KEY"),
+		},
+		JobVacancyKeys: JobVacancyConfig{
+			AdzunaKeys: loadAdzunaKeys(),
+		},
+	}
 }
 
 func loadAdzunaKeys() AdzunaKeys {
-	return AdzunaKeys{Adzuna_application_key: os.Getenv("ADZUNA_API_APPLICATION_KEY"), Adzuna_application_id: os.Getenv("ADZUNA_API_APPLICATION_ID")}
-
+	return AdzunaKeys{
+		ApplicationKey: os.Getenv("ADZUNA_API_APPLICATION_KEY"),
+		ApplicationID:  os.Getenv("ADZUNA_API_APPLICATION_ID"),
+	}
 }
 
-type HttpConfig struct {
-	PORT int
-}
+func loadHTTPConfig() HTTPConfig {
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
 
-func LoadHttpConfig() HttpConfig {
-	return HttpConfig{PORT: 8080}
+	return HTTPConfig{Port: port}
 }

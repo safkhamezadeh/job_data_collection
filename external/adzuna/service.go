@@ -1,7 +1,9 @@
 package adzuna
 
 import (
+	"context"
 	"encoding/json"
+	"job_vacancies/config"
 	apperror "job_vacancies/internal/AppError"
 	jobvacancies "job_vacancies/internal/job_vacancies"
 	"job_vacancies/internal/keywordextractor"
@@ -10,29 +12,35 @@ import (
 )
 
 type adzunaClient struct {
-	Adzuna_application_key string
-	Adzuna_application_id  string
-	Http_Client            *http.Client
+	applicationKey string
+	applicationID  string
+	httpClient     *http.Client
 }
 
-func NewAdzunaClient(key string, id string, httpClient *http.Client) *adzunaClient {
-	return &adzunaClient{Adzuna_application_key: key, Adzuna_application_id: id}
+func NewAdzunaClient(keys config.AdzunaKeys, httpClient *http.Client) *adzunaClient {
+	return &adzunaClient{
+		applicationKey: keys.ApplicationKey,
+		applicationID:  keys.ApplicationID,
+		httpClient:     httpClient,
+	}
 }
 
-func (a *adzunaClient) FindVacancies(keywords keywordextractor.KeyWordFormat, opt jobvacancies.SearchOptions) ([]jobvacancies.Job, error) {
+func (a *adzunaClient) FindVacancies(ctx context.Context, keywords keywordextractor.KeyWordFormat, opt jobvacancies.SearchOptions) ([]jobvacancies.Job, error) {
 	if !IsWhitelisted(Iso2CountryCode(opt.Location.Country)) {
 		return nil, jobvacancies.ErrInvalidCountry
 	}
 
 	pathParams := toPathParams(Iso2CountryCode(opt.Location.Country), int64(opt.Page))
 
-	queryParams := toQueryParams(a.Adzuna_application_id, a.Adzuna_application_key, keywords)
+	queryParams := toQueryParams(a.applicationID, a.applicationKey, int64(opt.Limit), keywords)
 
 	req, err := buildRequest(pathParams, queryParams)
 	if err != nil {
 		return nil, err
 	}
-	resp, err := a.Http_Client.Do(req)
+	req = req.WithContext(ctx)
+
+	resp, err := a.httpClient.Do(req)
 	if err != nil {
 		log.Printf("FindVacancies Adzuna error: %v", err)
 		return nil, err

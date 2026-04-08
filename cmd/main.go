@@ -1,7 +1,6 @@
 package main
 
 import (
-	"job_vacancies/config"
 	"log"
 
 	"github.com/joho/godotenv"
@@ -12,7 +11,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("err loading env: %v", err)
 	}
-	httpcfg := config.LoadHttpConfig() //only has port
-	apikeys := config.LoadApiKeys()
+	//httpcfg := config.LoadHttpConfig() //only has port
+	//apikeys := config.LoadApiKeys()
 
 }

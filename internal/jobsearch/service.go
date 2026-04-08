@@ -25,7 +25,7 @@ func (j *JobSearch) Search(ctx context.Context, input string, opt jobvacancies.S
 	if err != nil {
 		return nil, err
 	}
-	foundJobs, err := j.jobFinder.FindVacancies(keywords, opt)
+	foundJobs, err := j.jobFinder.FindVacancies(ctx, keywords, opt)
 	if err != nil {
 		return nil, err
 	}
