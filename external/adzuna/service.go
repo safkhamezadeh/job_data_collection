@@ -3,8 +3,8 @@ package adzuna
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"job_vacancies/config"
-	apperror "job_vacancies/internal/AppError"
 	jobvacancies "job_vacancies/internal/job_vacancies"
 	"job_vacancies/internal/keywordextractor"
 	"log"
@@ -48,21 +48,16 @@ func (a *adzunaClient) FindVacancies(ctx context.Context, keywords keywordextrac
 
 	if resp.StatusCode != http.StatusOK {
 		log.Printf("Adzuna returned status: %d", resp.StatusCode)
-		return nil, apperror.AppError{
-			Code:    "adzuna_error",
-			Message: "failed to fetch vacancies",
-		}
+		return nil, fmt.Errorf("adzuna: failed to fetch vacancies")
+
 	}
 
 	var adzunaResp AdzunaResponse
 	decoder := json.NewDecoder(resp.Body)
 
 	if err := decoder.Decode(&adzunaResp); err != nil {
-		log.Printf("Error decoding Adzuna response: %v", err)
-		return nil, apperror.AppError{
-			Code:    "parse_error",
-			Message: "failed to parse response",
-		}
+		return nil, fmt.Errorf("failed to parse response")
+
 	}
 
 	jobs := mapToJobs(adzunaResp)

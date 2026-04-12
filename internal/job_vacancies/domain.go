@@ -53,8 +53,8 @@ func (j Job) String() string {
 
 type Location struct {
 	Country CountryISO2
-	City    string
-	Region  string // state/province
+	//City    string
+	//Region  string // state/province
 	// Address    string // street + number
 	// PostalCode string
 }

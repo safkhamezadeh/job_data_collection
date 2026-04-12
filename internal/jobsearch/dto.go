@@ -14,10 +14,7 @@ type SearchOptDTO struct {
 }
 
 func (s SearchOptDTO) toSearchOpt() jobvacancies.SearchOptions {
-	loc := jobvacancies.Location{Country: jobvacancies.CountryISO2(s.Country),
-		City:   s.Location.City,
-		Region: s.toSearchOpt().Location.Region,
-	}
+	loc := jobvacancies.Location{Country: jobvacancies.CountryISO2(s.Country)}
 
 	return jobvacancies.SearchOptions{Location: loc,
 		Limit: s.Limit,

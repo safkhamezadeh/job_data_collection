@@ -2,7 +2,7 @@ package jobsearch
 
 import (
 	"context"
-	apperror "job_vacancies/internal/AppError"
+	"errors"
 	jobvacancies "job_vacancies/internal/job_vacancies"
 	"job_vacancies/internal/keywordextractor"
 )
@@ -35,13 +35,13 @@ func (j *JobSearch) Search(ctx context.Context, input string, opt jobvacancies.S
 
 func validateInput(input string) error {
 	if input == "" {
-		return apperror.New("INVALID_INPUT", "no input found")
+		return errors.New("no input found")
 	}
 	if len(input) < MIN_INPUT_LEN {
-		return apperror.New("INVALID_INPUT", "input too short, please try to describe what you want to do in the job")
+		return errors.New("input too short")
 	}
 	if len(input) > MAX_INPUT_LEN {
-		return apperror.New("INVALID_INPUT", "input too long")
+		return errors.New("input too long")
 	}
 
 	return nil

@@ -24,6 +24,9 @@ func (h *Handler) HandleFindJobs(w http.ResponseWriter, r *http.Request) {
 	defer cancel()
 
 	jobs, err := h.jobSearchService.Search(ctx, body.Input, body.SearchOpt.toSearchOpt())
+	if err != nil {
+
+	}
 	//call service
 	//return response
 }

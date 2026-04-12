@@ -1,9 +1,7 @@
 package jobvacancies
 
-import (
-	apperror "job_vacancies/internal/AppError"
-)
+import "errors"
 
 var (
-	ErrInvalidCountry apperror.AppError = apperror.AppError{Code: "INVALID_COUNTRY_ERROR", Message: "selected invalid country"}
+	ErrInvalidCountry error = errors.New("invalid country")
 )
