@@ -8,13 +8,13 @@ type UserInputDTO struct {
 }
 
 type SearchOptDTO struct {
-	Country string `json:"country,omitempty"`
-	Limit   int    `json:"limit,omitempty"`
-	Page    int    `json:"page,omitempty"`
+	CountryISO2 string `json:"country,omitempty"`
+	Limit       int    `json:"limit,omitempty"`
+	Page        int    `json:"page,omitempty"`
 }
 
 func (s SearchOptDTO) toSearchOpt() jobvacancies.SearchOptions {
-	loc := jobvacancies.Location{Country: jobvacancies.CountryISO2(s.Country)}
+	loc := jobvacancies.Location{Country: jobvacancies.CountryISO2(s.CountryISO2)}
 
 	return jobvacancies.SearchOptions{Location: loc,
 		Limit: s.Limit,

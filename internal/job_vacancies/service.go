@@ -8,6 +8,7 @@ import (
 
 type JobVacancyService struct {
 	providers []VacancyGetter
+	//deduplicator
 }
 
 func (s *JobVacancyService) Subscribe(p VacancyGetter) {

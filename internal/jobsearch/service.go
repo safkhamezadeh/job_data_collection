@@ -10,6 +10,7 @@ import (
 type JobSearch struct {
 	keywordExtractor keywordextractor.KeywordsExtractor
 	jobFinder        jobvacancies.VacancyGetter
+	//jobranker
 }
 
 func NewJobSearch(extractor keywordextractor.KeywordsExtractor, finder jobvacancies.VacancyGetter) *JobSearch {
@@ -20,6 +21,8 @@ func (j *JobSearch) Search(ctx context.Context, input string, opt jobvacancies.S
 	if err := validateInput(input); err != nil {
 		return nil, err
 	}
+
+	//validate opt
 
 	keywords, err := j.keywordExtractor.Translate(ctx, input)
 	if err != nil {
