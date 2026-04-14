@@ -20,6 +20,12 @@ func (h *Handler) HandleFindJobs(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	err = body.Validate()
+	if err != nil {
+		http.Error(w, "Invalid request body: "+err.Error(), http.StatusBadRequest)
+		return
+	}
+
 	ctx, cancel := context.WithTimeout(r.Context(), 15*time.Second)
 	defer cancel()
 

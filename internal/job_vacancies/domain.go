@@ -2,12 +2,12 @@ package jobvacancies
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"job_vacancies/internal/keywordextractor"
+	"job_vacancies/internal/location"
 	"time"
 )
-
-type CountryISO2 string
 
 type VacancyGetter interface {
 	FindVacancies(ctx context.Context, keywords keywordextractor.KeyWordFormat, opt SearchOptions) ([]Job, error)
@@ -52,7 +52,7 @@ func (j Job) String() string {
 }
 
 type Location struct {
-	Country CountryISO2
+	Country location.CountryISO2
 	//City    string
 	//Region  string // state/province
 	// Address    string // street + number
@@ -65,4 +65,20 @@ type SearchOptions struct {
 
 	// Pagination (best effort)
 	Page int
+}
+
+func (s SearchOptions) Validate() error {
+	if isValidCountry := location.IsValidISO2(s.Location.Country); !isValidCountry {
+		return errors.New("invalid country")
+	}
+
+	if s.Limit < 0 || s.Limit > 100 {
+		return errors.New("invalid limit")
+	}
+
+	if s.Page < 0 {
+		return errors.New("invalid page")
+	}
+
+	return nil
 }

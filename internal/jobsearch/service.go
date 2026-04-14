@@ -7,10 +7,16 @@ import (
 	"job_vacancies/internal/keywordextractor"
 )
 
+const (
+	MIN_INPUT_LEN int = 8
+	MAX_INPUT_LEN int = 300
+)
+
 type JobSearch struct {
 	keywordExtractor keywordextractor.KeywordsExtractor
 	jobFinder        jobvacancies.VacancyGetter
-	//jobranker
+	//jobranker        ranking.SimpleRanker
+	//cache            *cache.Cache
 }
 
 func NewJobSearch(extractor keywordextractor.KeywordsExtractor, finder jobvacancies.VacancyGetter) *JobSearch {
@@ -23,6 +29,9 @@ func (j *JobSearch) Search(ctx context.Context, input string, opt jobvacancies.S
 	}
 
 	//validate opt
+	if err := opt.Validate(); err != nil {
+		return nil, err
+	}
 
 	keywords, err := j.keywordExtractor.Translate(ctx, input)
 	if err != nil {
@@ -32,6 +41,8 @@ func (j *JobSearch) Search(ctx context.Context, input string, opt jobvacancies.S
 	if err != nil {
 		return nil, err
 	}
+
+	//do ranking
 
 	return foundJobs, nil
 }
