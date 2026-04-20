@@ -3,6 +3,7 @@ package jobsearch
 import (
 	"context"
 	"encoding/json"
+	"log"
 	"net/http"
 	"time"
 )
@@ -31,8 +32,10 @@ func (h *Handler) HandleFindJobs(w http.ResponseWriter, r *http.Request) {
 
 	jobs, err := h.jobSearchService.Search(ctx, body.Input, body.SearchOpt.toSearchOpt())
 	if err != nil {
-
+		http.Error(w, "Error finding Jobs", http.StatusInternalServerError)
+		log.Printf("Err HandleFindJobs .Search, Err: %v", err)
 	}
-	//call service
+
+	print(jobs)
 	//return response
 }

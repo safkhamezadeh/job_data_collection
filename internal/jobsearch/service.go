@@ -27,7 +27,6 @@ func (j *JobSearch) Search(ctx context.Context, input string, opt jobvacancies.S
 	if err := validateInput(input); err != nil {
 		return nil, err
 	}
-
 	//validate opt
 	if err := opt.Validate(); err != nil {
 		return nil, err
