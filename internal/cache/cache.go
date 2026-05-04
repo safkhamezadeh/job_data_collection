@@ -13,6 +13,13 @@ type InMemoryCache struct {
 	ttl   time.Duration
 }
 
+func NewInMemoryCache(ttl time.Duration) *InMemoryCache {
+	return &InMemoryCache{
+		cache: make(map[string]cacheItem),
+		ttl:   ttl,
+	}
+}
+
 func (c *InMemoryCache) StartCleanup(interval time.Duration) {
 	go func() {
 		for {

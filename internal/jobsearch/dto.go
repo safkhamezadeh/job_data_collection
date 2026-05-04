@@ -49,6 +49,8 @@ type JobDTO struct {
 }
 
 type SearchResponse struct {
-	Jobs     []JobDTO `json:"jobs"`
-	Warnings []string `json:"warnings,omitempty"` // optional
+	SessionKey string   `json:"session_key"`
+	Jobs       []JobDTO `json:"jobs"`
+	TotalCount int      `json:"total_count"`
+	Page       int      `json:"page"`
 }

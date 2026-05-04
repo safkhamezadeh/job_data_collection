@@ -67,11 +67,3 @@ func scoreList(title, desc string, list []string, multiplier int) int {
 func cmpJobPoints(a JobWithPoints, b JobWithPoints) int {
 	return b.points - a.points
 }
-
-//per job assign points to it
-//assign points based on if description matches a word in keywords
-//first index most points, last index least points
-//so check len of index to decide how many points it should get
-
-//point system :maxpoints = shortest len * 2?
-//or check per slice and give maxpoints seperately?
