@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-type JobWithPoints struct {
+type jobWithPoints struct {
 	job    jobvacancies.Job
 	points int
 }
@@ -16,8 +16,12 @@ type SimpleJobRanker struct {
 	//pointsystem
 }
 
+func NewJobRanker() SimpleJobRanker {
+	return SimpleJobRanker{}
+}
+
 func (SimpleJobRanker) RankJobs(keywords keywordextractor.KeyWordFormat, jobs []jobvacancies.Job) []jobvacancies.Job {
-	var jobsWithPoints []JobWithPoints
+	var jobsWithPoints []jobWithPoints
 
 	for i := range jobs {
 		jobsWithPoints = append(jobsWithPoints, assignPoints(keywords, jobs[i]))
@@ -33,7 +37,7 @@ func (SimpleJobRanker) RankJobs(keywords keywordextractor.KeyWordFormat, jobs []
 
 }
 
-func assignPoints(keywords keywordextractor.KeyWordFormat, job jobvacancies.Job) JobWithPoints {
+func assignPoints(keywords keywordextractor.KeyWordFormat, job jobvacancies.Job) jobWithPoints {
 	title := strings.ToLower(job.Title)
 	desc := strings.ToLower(job.Description)
 
@@ -42,7 +46,7 @@ func assignPoints(keywords keywordextractor.KeyWordFormat, job jobvacancies.Job)
 	points += scoreList(title, desc, keywords.JobTitles, 3)
 	points += scoreList(title, desc, keywords.Keywords, 1)
 
-	return JobWithPoints{job: job, points: points}
+	return jobWithPoints{job: job, points: points}
 }
 
 func scoreList(title, desc string, list []string, multiplier int) int {
@@ -64,6 +68,6 @@ func scoreList(title, desc string, list []string, multiplier int) int {
 	return points
 }
 
-func cmpJobPoints(a JobWithPoints, b JobWithPoints) int {
+func cmpJobPoints(a jobWithPoints, b jobWithPoints) int {
 	return b.points - a.points
 }

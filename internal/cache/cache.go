@@ -1,35 +1,43 @@
 package cache
 
 import (
-	"errors"
-	jobvacancies "job_vacancies/internal/job_vacancies"
+	"context"
 	"sync"
 	"time"
+
+	"job_vacancies/internal/jobsearch"
 )
 
-type InMemoryCache struct {
+type InMemoryCache[T any] struct {
 	mu    sync.RWMutex
-	cache map[string]cacheItem //map of id and slice of jobs
+	cache map[jobsearch.CacheID]cacheItem[T]
 	ttl   time.Duration
 }
 
-func NewInMemoryCache(ttl time.Duration) *InMemoryCache {
-	return &InMemoryCache{
-		cache: make(map[string]cacheItem),
+func NewInMemoryCache[T any](ttl time.Duration) *InMemoryCache[T] {
+	return &InMemoryCache[T]{
+		cache: make(map[jobsearch.CacheID]cacheItem[T]),
 		ttl:   ttl,
 	}
 }
 
-func (c *InMemoryCache) StartCleanup(interval time.Duration) {
+func (c *InMemoryCache[T]) StartCleanup(ctx context.Context, interval time.Duration) {
 	go func() {
+		ticker := time.NewTicker(interval)
+		defer ticker.Stop()
+
 		for {
-			time.Sleep(interval)
-			c.cleanup()
+			select {
+			case <-ticker.C:
+				c.cleanup()
+			case <-ctx.Done():
+				return
+			}
 		}
 	}()
 }
 
-func (c *InMemoryCache) cleanup() {
+func (c *InMemoryCache[T]) cleanup() {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
@@ -40,41 +48,47 @@ func (c *InMemoryCache) cleanup() {
 			delete(c.cache, id)
 		}
 	}
-
 }
 
-func (c *InMemoryCache) Set(id string, data []jobvacancies.Job) {
+func (c *InMemoryCache[T]) Set(id jobsearch.CacheID, data T) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	item := cacheItem{jobs: data, lastAccessed: time.Now()}
-	c.cache[id] = item
 
+	c.cache[id] = cacheItem[T]{
+		data:         data,
+		lastAccessed: time.Now(),
+	}
 }
 
-func (c *InMemoryCache) Get(id string) ([]jobvacancies.Job, error) {
-	c.mu.Lock()
-	defer c.mu.Unlock()
+func (c *InMemoryCache[T]) Get(id jobsearch.CacheID) (T, bool) {
+	c.mu.RLock()
 	item, ok := c.cache[id]
+	c.mu.RUnlock()
+
 	if !ok {
-		return nil, errors.New("cache id doesnt exist")
+		var zero T
+		return zero, false
 	}
-	if !item.validateTTL(c.ttl) {
+
+	if time.Since(item.lastAccessed) > c.ttl {
+		c.mu.Lock()
 		delete(c.cache, id)
-		return nil, errors.New("search expired")
+		c.mu.Unlock()
+
+		var zero T
+		return zero, false
 	}
+
+	// update last accessed (sliding TTL)
+	c.mu.Lock()
 	item.lastAccessed = time.Now()
 	c.cache[id] = item
-	return c.cache[id].jobs, nil
+	c.mu.Unlock()
+
+	return item.data, true
 }
 
-type cacheItem struct {
-	jobs         []jobvacancies.Job
+type cacheItem[T any] struct {
+	data         T
 	lastAccessed time.Time
-}
-
-func (i cacheItem) validateTTL(ttl time.Duration) bool {
-	if time.Since(i.lastAccessed) < ttl {
-		return true
-	}
-	return false
 }

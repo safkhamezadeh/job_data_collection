@@ -2,12 +2,14 @@ package jobsearch
 
 import (
 	"errors"
+
 	jobvacancies "job_vacancies/internal/job_vacancies"
 	"job_vacancies/internal/location"
 )
 
 type UserInputDTO struct {
 	Input     string       `json:"input"`
+	CacheId   CacheID      `json:"session_id"`
 	SearchOpt SearchOptDTO `json:"search_options,omitempty"`
 }
 
@@ -49,7 +51,7 @@ type JobDTO struct {
 }
 
 type SearchResponse struct {
-	SessionKey string   `json:"session_key"`
+	SessionKey CacheID  `json:"session_key"`
 	Jobs       []JobDTO `json:"jobs"`
 	TotalCount int      `json:"total_count"`
 	Page       int      `json:"page"`

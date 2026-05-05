@@ -30,7 +30,7 @@ func (h *Handler) HandleFindJobs(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), 15*time.Second)
 	defer cancel()
 
-	jobs, err := h.jobSearchService.Search(ctx, body.Input, body.SearchOpt.toSearchOpt())
+	jobs, _, err := h.jobSearchService.Search(ctx, body.Input, body.CacheId, body.SearchOpt.toSearchOpt())
 	if err != nil {
 		http.Error(w, "Error finding Jobs", http.StatusInternalServerError)
 		log.Printf("Err HandleFindJobs .Search, Err: %v", err)

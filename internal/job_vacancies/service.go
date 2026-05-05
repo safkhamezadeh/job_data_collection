@@ -29,5 +29,6 @@ func (s *JobVacancyService) FindVacancies(ctx context.Context, keywords keyworde
 		}
 		allJobs = append(allJobs, result...)
 	}
+
 	return allJobs, nil
 }
