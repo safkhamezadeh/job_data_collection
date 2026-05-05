@@ -4,19 +4,17 @@ import (
 	"context"
 	"sync"
 	"time"
-
-	"job_vacancies/internal/jobsearch"
 )
 
 type InMemoryCache[T any] struct {
 	mu    sync.RWMutex
-	cache map[jobsearch.CacheID]cacheItem[T]
+	cache map[string]cacheItem[T]
 	ttl   time.Duration
 }
 
 func NewInMemoryCache[T any](ttl time.Duration) *InMemoryCache[T] {
 	return &InMemoryCache[T]{
-		cache: make(map[jobsearch.CacheID]cacheItem[T]),
+		cache: make(map[string]cacheItem[T]),
 		ttl:   ttl,
 	}
 }
@@ -50,7 +48,7 @@ func (c *InMemoryCache[T]) cleanup() {
 	}
 }
 
-func (c *InMemoryCache[T]) Set(id jobsearch.CacheID, data T) {
+func (c *InMemoryCache[T]) Set(id string, data T) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
@@ -60,7 +58,7 @@ func (c *InMemoryCache[T]) Set(id jobsearch.CacheID, data T) {
 	}
 }
 
-func (c *InMemoryCache[T]) Get(id jobsearch.CacheID) (T, bool) {
+func (c *InMemoryCache[T]) Get(id string) (T, bool) {
 	c.mu.RLock()
 	item, ok := c.cache[id]
 	c.mu.RUnlock()

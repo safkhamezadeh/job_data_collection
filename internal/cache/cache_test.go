@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	jobvacancies "job_vacancies/internal/job_vacancies"
-	"job_vacancies/internal/jobsearch"
 	"sync"
 	"testing"
 	"time"
@@ -35,8 +34,8 @@ func newJobCache(ttl time.Duration) jobCache {
 	return newCache[[]jobvacancies.Job](ttl)
 }
 
-func id(s string) jobsearch.CacheID {
-	return jobsearch.CacheID(s)
+func id(s string) string {
+	return (s)
 }
 
 // --- Tests ---
@@ -190,14 +189,14 @@ func TestGet_RefreshesItemLifetime(t *testing.T) {
 func TestGet_MultipleKeys_AreIndependent(t *testing.T) {
 	c := newJobCache(time.Minute)
 
-	c.Set(id("a"), makeJobs(1))
-	c.Set(id("b"), makeJobs(2))
-	c.Set(id("c"), makeJobs(3))
+	c.Set("a", makeJobs(1))
+	c.Set("b", makeJobs(2))
+	c.Set("c", makeJobs(3))
 
-	tests := map[jobsearch.CacheID]int{
-		id("a"): 1,
-		id("b"): 2,
-		id("c"): 3,
+	tests := map[string]int{
+		"a": 1,
+		"b": 2,
+		"c": 3,
 	}
 
 	for k, expected := range tests {
