@@ -3,12 +3,11 @@ package cache_test
 import (
 	"context"
 	"fmt"
+	"job_vacancies/internal/infrastructure/cache"
 	jobvacancies "job_vacancies/internal/job_vacancies"
 	"sync"
 	"testing"
 	"time"
-
-	"job_vacancies/internal/cache"
 )
 
 // --- Helpers ---
