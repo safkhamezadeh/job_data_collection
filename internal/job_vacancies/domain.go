@@ -61,10 +61,8 @@ type Location struct {
 
 type SearchOptions struct {
 	Location Location
-	Limit    int
-
-	// Pagination (best effort)
-	Page int
+	Limit    int // amount of data to send maximum
+	Page     int
 }
 
 func (s SearchOptions) Validate() error {
