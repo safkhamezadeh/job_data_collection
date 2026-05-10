@@ -13,7 +13,7 @@ type Handler struct {
 }
 
 func (h *Handler) RegisterRoute(mux *http.ServeMux) {
-	mux.HandleFunc("/api/getJobs", http.HandlerFunc(h.HandleFindJobs))
+	mux.HandleFunc("/jobs/search", http.HandlerFunc(h.HandleFindJobs))
 }
 
 func (h *Handler) HandleFindJobs(w http.ResponseWriter, r *http.Request) {
