@@ -12,6 +12,10 @@ type Handler struct {
 	jobSearchService *JobSearchService
 }
 
+func (h *Handler) RegisterRoute(mux *http.ServeMux) {
+	mux.HandleFunc("/api/getJobs", http.HandlerFunc(h.HandleFindJobs))
+}
+
 func (h *Handler) HandleFindJobs(w http.ResponseWriter, r *http.Request) {
 	// parse request
 	var body UserInputDTO
