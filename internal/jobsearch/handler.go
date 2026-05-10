@@ -9,7 +9,7 @@ import (
 )
 
 type Handler struct {
-	jobSearchService *JobSearchService
+	JobSearchService *JobSearchService
 }
 
 func (h *Handler) RegisterRoute(mux *http.ServeMux) {
@@ -34,7 +34,7 @@ func (h *Handler) HandleFindJobs(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), 15*time.Second)
 	defer cancel()
 
-	result, err := h.jobSearchService.Search(
+	result, err := h.JobSearchService.Search(
 		ctx,
 		body.Input,
 		CacheID(body.SessionID),

@@ -42,12 +42,12 @@ func loadAPIKeys() APIKeyConfig {
 			GoogleGeminiAPIKey: os.Getenv("GEMINI_API_KEY"),
 		},
 		JobVacancyKeys: JobVacancyConfig{
-			AdzunaKeys: loadAdzunaKeys(),
+			AdzunaKeys: LoadAdzunaKeys(),
 		},
 	}
 }
 
-func loadAdzunaKeys() AdzunaKeys {
+func LoadAdzunaKeys() AdzunaKeys {
 	return AdzunaKeys{
 		ApplicationKey: os.Getenv("ADZUNA_API_APPLICATION_KEY"),
 		ApplicationID:  os.Getenv("ADZUNA_API_APPLICATION_ID"),

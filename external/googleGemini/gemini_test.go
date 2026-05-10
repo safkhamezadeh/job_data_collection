@@ -7,7 +7,6 @@ import (
 	"testing"
 
 	"github.com/joho/godotenv"
-	"google.golang.org/genai"
 )
 
 func TestTranslate_Integration(t *testing.T) {
@@ -28,11 +27,10 @@ Format:
 titles: t1, t2, t3, t4, t5
 keywords: w1, w2, w3, w4, w5`
 
-	genclient, err := genai.NewClient(ctx, nil)
+	client, err := googlegemini.NewGeminiClient(ctx)
 	if err != nil {
 		t.Fatalf("failed to create genai client: %v", err)
 	}
-	client := googlegemini.NewGeminiClient(genclient)
 
 	res, err := client.Translate(ctx, prompt)
 	if err != nil {

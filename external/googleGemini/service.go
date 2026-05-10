@@ -35,8 +35,12 @@ type geminiClient struct {
 	Client *genai.Client
 }
 
-func NewGeminiClient(client *genai.Client) keywordextractor.KeywordsExtractor {
-	return &geminiClient{Client: client}
+func NewGeminiClient(ctx context.Context) (keywordextractor.KeywordsExtractor, error) {
+	genclient, err := genai.NewClient(ctx, nil)
+	if err != nil {
+		return &geminiClient{}, err
+	}
+	return &geminiClient{Client: genclient}, nil
 }
 
 func (g *geminiClient) Translate(ctx context.Context, inputstr string) (keywordextractor.KeyWordFormat, error) {

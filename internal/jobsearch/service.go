@@ -32,7 +32,7 @@ type JobSearchService struct {
 	cache            Cache
 }
 
-func NewJobSearch(
+func NewJobSearchService(
 	extractor keywordextractor.KeywordsExtractor,
 	finder jobvacancies.VacancyGetter,
 	ranker Ranker,
@@ -104,10 +104,7 @@ func paginate(jobs []jobvacancies.Job, page, limit int) []jobvacancies.Job {
 	if start >= len(jobs) {
 		return nil
 	}
-	end := start + limit
-	if end > len(jobs) {
-		end = len(jobs)
-	}
+	end := min(start+limit, len(jobs))
 	return jobs[start:end]
 }
 
