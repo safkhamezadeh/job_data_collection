@@ -2,6 +2,7 @@ package jobsearch
 
 import (
 	"errors"
+	"time"
 
 	jobvacancies "job_vacancies/internal/job_vacancies"
 	"job_vacancies/internal/location"
@@ -9,7 +10,7 @@ import (
 
 type UserInputDTO struct {
 	Input     string       `json:"input"`
-	CacheId   CacheID      `json:"session_id"`
+	SessionID string       `json:"session_id"`
 	SearchOpt SearchOptDTO `json:"search_options,omitempty"`
 }
 
@@ -48,11 +49,66 @@ func (s SearchOptDTO) toSearchOpt() jobvacancies.SearchOptions {
 }
 
 type JobDTO struct {
+	Id                  string    `json:"id"`
+	Title               string    `json:"title"`
+	Company             string    `json:"company"`
+	Description         string    `json:"description"`
+	LocationDisplayName string    `json:"location_display_name"`
+	Date_posted         time.Time `json:"date_posted"`
+	Source              string    `json:"source"` // like "adzuna, indeed"
+	Salary_Min          float64   `json:"salary_min"`
+	Salary_Max          float64   `json:"salary_max"`
+	External_url        string    `json:"external_url"`
 }
 
-type SearchResponse struct {
+func ToJobDTO(job jobvacancies.Job) JobDTO {
+	return JobDTO{
+		Id:                  job.Id,
+		Title:               job.Title,
+		Company:             job.Company,
+		Description:         job.Description,
+		LocationDisplayName: job.LocationDisplayName,
+		Date_posted:         job.Date_posted,
+		Source:              job.Source,
+		Salary_Min:          job.Salary_Min,
+		Salary_Max:          job.Salary_Max,
+		External_url:        job.External_url,
+	}
+}
+
+func ToJobDTOs(jobs []jobvacancies.Job) []JobDTO {
+	jobDTOs := make([]JobDTO, len(jobs))
+
+	for i, job := range jobs {
+		jobDTOs[i] = JobDTO{
+			Id:                  job.Id,
+			Title:               job.Title,
+			Company:             job.Company,
+			Description:         job.Description,
+			LocationDisplayName: job.LocationDisplayName,
+			Date_posted:         job.Date_posted,
+			Source:              job.Source,
+			Salary_Min:          job.Salary_Min,
+			Salary_Max:          job.Salary_Max,
+			External_url:        job.External_url,
+		}
+	}
+
+	return jobDTOs
+}
+
+type SearchResponseDTO struct {
 	SessionKey CacheID  `json:"session_key"`
 	Jobs       []JobDTO `json:"jobs"`
 	TotalCount int      `json:"total_count"`
 	Page       int      `json:"page"`
+}
+
+func toSearchResponseDTO(res SearchResults) SearchResponseDTO {
+	return SearchResponseDTO{
+		SessionKey: res.SessionID,
+		Jobs:       ToJobDTOs(res.Jobs),
+		TotalCount: res.TotalCount,
+		Page:       res.Page,
+	}
 }

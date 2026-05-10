@@ -25,7 +25,7 @@ type Cache interface {
 	Get(id string) ([]jobvacancies.Job, bool)
 }
 
-type JobSearch struct {
+type JobSearchService struct {
 	keywordExtractor keywordextractor.KeywordsExtractor
 	jobFinder        jobvacancies.VacancyGetter
 	jobRanker        Ranker
@@ -37,8 +37,8 @@ func NewJobSearch(
 	finder jobvacancies.VacancyGetter,
 	ranker Ranker,
 	cache Cache,
-) *JobSearch {
-	return &JobSearch{
+) *JobSearchService {
+	return &JobSearchService{
 		keywordExtractor: extractor,
 		jobFinder:        finder,
 		jobRanker:        ranker,
@@ -53,7 +53,7 @@ type SearchResults struct {
 	Page       int
 }
 
-func (j *JobSearch) Search(ctx context.Context, input string, sessionID CacheID, opt jobvacancies.SearchOptions) (SearchResults, error) {
+func (j *JobSearchService) Search(ctx context.Context, input string, sessionID CacheID, opt jobvacancies.SearchOptions) (SearchResults, error) {
 	// validate first, before any cache or network calls
 	if err := validateInput(input); err != nil {
 		return SearchResults{}, err
