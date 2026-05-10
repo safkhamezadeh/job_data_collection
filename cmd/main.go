@@ -57,7 +57,7 @@ func main() {
 	}
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("/jobs/search", h.HandleFindJobs)
+	h.RegisterRoute(mux)
 
 	// -------------------------
 	// Server
