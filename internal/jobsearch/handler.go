@@ -13,7 +13,7 @@ type Handler struct {
 }
 
 func (h *Handler) HandleFindJobs(w http.ResponseWriter, r *http.Request) {
-	//parse req
+	// parse request
 	var body UserInputDTO
 	err := json.NewDecoder(r.Body).Decode(&body)
 	if err != nil {
@@ -30,12 +30,25 @@ func (h *Handler) HandleFindJobs(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), 15*time.Second)
 	defer cancel()
 
-	result, err := h.jobSearchService.Search(ctx, body.Input, CacheID(body.SessionID), body.SearchOpt.toSearchOpt())
+	result, err := h.jobSearchService.Search(
+		ctx,
+		body.Input,
+		CacheID(body.SessionID),
+		body.SearchOpt.toSearchOpt(),
+	)
 	if err != nil {
-		http.Error(w, "Error finding Jobs", http.StatusInternalServerError)
 		log.Printf("Err HandleFindJobs .Search, Err: %v", err)
+		http.Error(w, "Error finding jobs", http.StatusInternalServerError)
+		return
 	}
 
-	print(result)
-	//return response
+	resDTO := toSearchResponseDTO(result)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
+	err = json.NewEncoder(w).Encode(resDTO)
+	if err != nil {
+		log.Printf("Err encoding response: %v", err)
+	}
 }
