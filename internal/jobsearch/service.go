@@ -5,6 +5,7 @@ import (
 	"errors"
 	jobvacancies "job_vacancies/internal/job_vacancies"
 	"job_vacancies/internal/keywordextractor"
+	"log"
 
 	"github.com/google/uuid"
 )
@@ -53,49 +54,76 @@ type SearchResults struct {
 	Page       int
 }
 
-func (j *JobSearchService) Search(ctx context.Context, input string, sessionID CacheID, opt jobvacancies.SearchOptions) (SearchResults, error) {
-	// validate first, before any cache or network calls
+func (j *JobSearchService) Search(
+	ctx context.Context,
+	input string,
+	sessionID CacheID,
+	opt jobvacancies.SearchOptions,
+) (SearchResults, error) {
+
+	log.Printf("[Search] start input=%s session=%s page=%d limit=%d",
+		input, sessionID, opt.Page, opt.Limit)
+
+	// validate
 	if err := validateInput(input); err != nil {
+		log.Printf("[Search] input validation failed: %v", err)
 		return SearchResults{}, err
 	}
 	if err := opt.Validate(); err != nil {
+		log.Printf("[Search] options validation failed: %v", err)
 		return SearchResults{}, err
 	}
 
-	// cache hit — user is paginating an existing session
+	// cache hit
 	if sessionID != "" {
 		if cached, ok := j.cache.Get(string(sessionID)); ok {
+			log.Printf("[Search] cache HIT session=%s total_cached=%d",
+				sessionID, len(cached))
+
+			page := paginate(cached, opt.Page, opt.Limit)
+
 			return SearchResults{
-				Jobs:       paginate(cached, opt.Page, opt.Limit),
+				Jobs:       page,
 				SessionID:  sessionID,
 				TotalCount: len(cached),
 				Page:       opt.Page,
 			}, nil
 		}
+
+		log.Printf("[Search] cache MISS session=%s", sessionID)
 	}
 
-	// cache miss — new search
+	// keyword extraction
 	keywords, err := j.keywordExtractor.Translate(ctx, input)
 	if err != nil {
+		log.Printf("[Search] keyword extraction failed: %v", err)
 		return SearchResults{}, err
 	}
+
+	// job fetch
 	foundJobs, err := j.jobFinder.FindVacancies(ctx, keywords, opt)
 	if err != nil {
+		log.Printf("[Search] jobFinder failed: %v", err)
 		return SearchResults{}, err
 	}
+
+	// ranking
 	ranked := j.jobRanker.RankJobs(keywords, foundJobs)
 
+	// cache set
 	newSessionID := CacheID(uuid.NewString())
 	j.cache.Set(string(newSessionID), ranked)
 
+	// pagination
+	page := paginate(ranked, 1, opt.Limit)
+
 	return SearchResults{
-		Jobs:       paginate(ranked, 1, opt.Limit),
+		Jobs:       page,
 		SessionID:  newSessionID,
 		TotalCount: len(ranked),
 		Page:       1,
 	}, nil
 }
-
 func paginate(jobs []jobvacancies.Job, page, limit int) []jobvacancies.Job {
 	if page < 1 {
 		page = 1

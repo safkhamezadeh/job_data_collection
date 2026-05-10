@@ -63,8 +63,6 @@ func buildRequest(pathParams PathParams, queryParams QueryParams) (*http.Request
 
 	finalURL := fullPath + "?" + queryString
 
-	log.Printf("final url: %v", finalURL)
-
 	req, err := http.NewRequest("GET", finalURL, nil)
 	if err != nil {
 		return nil, err
@@ -101,7 +99,7 @@ func mapToJobs(resp AdzunaResponse) []jobvacancies.Job {
 	var jobs []jobvacancies.Job
 
 	for _, j := range resp.Results {
-		jobs = append(jobs, jobvacancies.Job{
+		job := jobvacancies.Job{
 			Id:                  j.ID,
 			Title:               j.Title,
 			Company:             j.Company.DisplayName,
@@ -112,7 +110,19 @@ func mapToJobs(resp AdzunaResponse) []jobvacancies.Job {
 			Source:              "Adzuna",
 			Salary_Min:          j.SalaryMin,
 			Salary_Max:          j.SalaryMax,
-		})
+		}
+
+		log.Printf(
+			"[Adzuna Job] id=%s title=%s company=%s location=%s salary_min=%f salary_max=%f",
+			job.Id,
+			job.Title,
+			job.Company,
+			job.LocationDisplayName,
+			job.Salary_Min,
+			job.Salary_Max,
+		)
+
+		jobs = append(jobs, job)
 	}
 
 	return jobs
