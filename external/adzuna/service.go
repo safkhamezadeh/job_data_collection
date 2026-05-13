@@ -34,7 +34,7 @@ func (a *adzunaClient) FindVacancies(ctx context.Context, keywords keywordextrac
 
 	queryParams := toQueryParams(a.applicationID, a.applicationKey, int64(opt.Limit), keywords)
 
-	req, err := buildRequest(pathParams, queryParams)
+	req, err := buildRequest(ctx, pathParams, queryParams)
 	if err != nil {
 		return nil, err
 	}

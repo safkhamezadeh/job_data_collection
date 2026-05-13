@@ -1,6 +1,7 @@
 package adzuna
 
 import (
+	"context"
 	"fmt"
 	jobvacancies "job_vacancies/internal/job_vacancies"
 	"job_vacancies/internal/keywordextractor"
@@ -54,7 +55,7 @@ func buildQuery(params QueryParams) string {
 	return q.Encode()
 }
 
-func buildRequest(pathParams PathParams, queryParams QueryParams) (*http.Request, error) {
+func buildRequest(ctx context.Context, pathParams PathParams, queryParams QueryParams) (*http.Request, error) {
 	baseURL := "https://api.adzuna.com/v1/api"
 	pathTemplate := "/jobs/{country}/search/{page}"
 
@@ -63,7 +64,7 @@ func buildRequest(pathParams PathParams, queryParams QueryParams) (*http.Request
 
 	finalURL := fullPath + "?" + queryString
 
-	req, err := http.NewRequest("GET", finalURL, nil)
+	req, err := http.NewRequestWithContext(ctx, "GET", finalURL, nil)
 	if err != nil {
 		return nil, err
 	}

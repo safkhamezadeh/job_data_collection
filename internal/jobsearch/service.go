@@ -3,6 +3,7 @@ package jobsearch
 import (
 	"context"
 	"errors"
+	"fmt"
 	jobvacancies "job_vacancies/internal/job_vacancies"
 	"job_vacancies/internal/keywordextractor"
 	"log"
@@ -100,11 +101,19 @@ func (j *JobSearchService) Search(
 		return SearchResults{}, err
 	}
 
+	if ctx.Err() != nil {
+		return SearchResults{}, fmt.Errorf("translate aborted: %w", ctx.Err())
+	}
+
 	// job fetch
 	foundJobs, err := j.jobFinder.FindVacancies(ctx, keywords, opt)
 	if err != nil {
 		log.Printf("[Search] jobFinder failed: %v", err)
 		return SearchResults{}, err
+	}
+
+	if ctx.Err() != nil {
+		return SearchResults{}, fmt.Errorf("search aborted: %w", ctx.Err())
 	}
 
 	// ranking

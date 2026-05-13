@@ -11,6 +11,8 @@ import (
 	"job_vacancies/internal/ranker"
 	"log"
 	"net/http"
+	"os"
+	"os/signal"
 	"time"
 
 	"github.com/joho/godotenv"
@@ -23,14 +25,19 @@ func main() {
 	}
 	cfg := config.Load()
 
-	ctx := context.Background()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 	// -------------------------
 	// Infrastructure
 	// -------------------------
 
 	cacheImpl := cache.NewInMemoryCache[[]jobvacancies.Job](15 * time.Minute)
+	cacheImpl.StartCleanup(ctx, 10*time.Minute)
 
 	keywordExtractor, err := googlegemini.NewGeminiClient(ctx)
+	if err != nil {
+		log.Fatalf("failed to init Gemini client: %v", err)
+	}
 
 	httpClient := &http.Client{Timeout: 10 * time.Second}
 	jobFinder := adzuna.NewAdzunaClient(cfg.APIKeys.JobVacancyKeys.AdzunaKeys, httpClient)
@@ -71,6 +78,23 @@ func main() {
 		IdleTimeout:  60 * time.Second,
 	}
 
-	log.Printf("Server running on :%s", cfg.HTTP.Port)
-	log.Fatal(srv.ListenAndServe())
+	go func() {
+		log.Printf("Server running on :%s", cfg.HTTP.Port)
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("server error: %v", err)
+		}
+	}()
+
+	// wait for interrupt (Ctrl+C)
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, os.Interrupt)
+	<-stop
+
+	log.Println("Shutting down...")
+
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	srv.Shutdown(shutdownCtx)
+	cancel() // stops cache cleanup goroutine
 }
